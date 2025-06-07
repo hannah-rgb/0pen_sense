@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
             demoOverlay.style.position = 'absolute';
             demoOverlay.style.top = thumbnail.offsetTop + 'px';
             demoOverlay.style.left = (thumbnail.offsetLeft + thumbnail.offsetWidth) + 'px';
-            demoOverlay.style.width = '120px';
+            demoOverlay.style.width = '161.25px';
             demoOverlay.style.zIndex = '101';
             demoOverlay.style.display = 'flex';
             demoOverlay.style.flexDirection = 'column';
@@ -117,11 +117,11 @@ document.addEventListener('DOMContentLoaded', () => {
             labelWrapper.style.display = 'flex';
             labelWrapper.style.justifyContent = 'space-between';
             labelWrapper.style.alignItems = 'center';
-            labelWrapper.style.width = '120px';
+            labelWrapper.style.width = '161.25px';
 
             const labelText = document.createElement('span');
             labelText.className = 'toggle-label-text';
-            labelText.textContent = 'DEMO/PROTOTYPE       ';
+            labelText.textContent = 'DEMO/PROTOTYPE';
 
             const toggleWrapper = document.createElement('label');
             toggleWrapper.className = 'switch';
@@ -139,8 +139,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const gif = document.createElement('img');
             gif.src = `assets/demonstration${index + 1}.gif`;
             gif.alt = `Demonstration for ${name}`;
-            gif.style.width = '120px';
-            gif.style.height = '120px';
+            gif.style.width = '161.25px';
+            gif.style.height = '161.25px';
             gif.style.objectFit = 'cover';
             gif.style.display = toggleState ? 'block' : 'none';
 
