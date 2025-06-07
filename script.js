@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
             labelWrapper.appendChild(toggleWrapper);
 
             const gif = document.createElement('img');
-            gif.src = `/assets/demonstration${index + 1}.gif`;
+            gif.src = `assets/demonstration${index + 1}.gif`;
             gif.alt = `Demonstration for ${name}`;
             gif.style.width = '120px';
             gif.style.height = '120px';
@@ -191,7 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             detailSection.innerHTML = `
                 <div class="sensor_image" style="background:#fff000; height: 200px; grid-column: span 1;">
-                  <img src="/assets/thumbnail1.png" alt="${name}" style="height: 100%; width: auto; object-fit: contain;">
+                  <img src="assets/thumbnail1.png" alt="${name}" style="height: 100%; width: auto; object-fit: contain;">
                 </div>
                 <div class="detail-block" style="grid-column: span 1;">
                   <div class="block-title">CONNECT</div>
