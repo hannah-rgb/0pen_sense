@@ -157,19 +157,22 @@ iframe {
   
 }
 
-.sensor_image,
+.sensor_image{
+    grid-column: span 1;
+}
+
 .connect{
     grid-column: span 1;
     font-size: 15px;
 }
+
 .arduino-code,
 .p5-code,
-
 .sensor-use-case,
 .arduino-editor,
 .p5-editor {
   width: 100%;
-  height: 100%;
+  height: 200px;
   font-family: 'PPFraktionMono-Regular', monospace;
   font-size: 15px;
   background: #fff;
