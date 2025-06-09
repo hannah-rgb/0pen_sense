@@ -20,12 +20,14 @@ hr {
 header {
     display: flex;
     justify-content: space-between;
+    align-items: center; /* ✅ Aligns logo and About vertically */
     margin: 0px;
     margin-top: 15px;
     padding: 0px;
     padding-top: 15px;
     background-color: #fff;
 }
+
 
 header .logo img {
     width: 150px;
