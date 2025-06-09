@@ -28,9 +28,10 @@ header {
 header .logo img {
     width: 150px;
     cursor: pointer;
-    margin: 0px;
+    /* margin: 0px; */
     margin-top: 15px;
     padding: 0px;
+    padding-top: 15px;
 }
 
 header .about a {
