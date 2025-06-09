@@ -28,7 +28,7 @@ header {
 header .logo img {
     width: 100px;
     cursor: pointer;
-    margin: 0px;
+    margin: 15px 0px;
     padding: 0px;
 }
 
