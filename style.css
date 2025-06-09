@@ -26,9 +26,10 @@ header {
 }
 
 header .logo img {
-    width: 100px;
+    width: 150px;
     cursor: pointer;
-    margin: 15px 0px 0px 0px;
+    margin: 0px;
+    margin-top: 15px;
     padding: 0px;
 }
 
