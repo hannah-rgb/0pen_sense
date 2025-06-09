@@ -190,8 +190,8 @@ document.addEventListener('DOMContentLoaded', () => {
             detailTitle.style.display = 'block';
 
             detailSection.innerHTML = `
-                <div class="sensor_image" style="background:#fff000; height: 200px; grid-column: span 1;">
-                  <img src="assets/thumbnail1.png" alt="${name}" style="height: 100%; width: auto; object-fit: contain;">
+                <div class="sensor_image" style="background:#ffffff; height: 200px; grid-column: span 1;">
+                  <img src="assets/thumbnail1.png" alt="${name}" style="height: 100%; width: 90%; object-fit: contain;">
                 </div>
                 <div class="detail-block" style="grid-column: span 1;">
                   <div class="block-title">CONNECT</div>
