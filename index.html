@@ -1,71 +1,64 @@
-<!-- Embed p5.js editable code like on the official examples site -->
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Editable p5.js Code Example</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
-    <style>
-      body {
-        font-family: monospace;
-        margin: 0;
-        padding: 0;
-      }
-      #editor {
-        width: 100%;
-        height: 200px;
-        padding: 10px;
-        box-sizing: border-box;
-        font-size: 13px;
-      }
-      iframe {
-        width: 100%;
-        height: 300px;
-        border: 1px solid #ccc;
-      }
-    </style>
-  </head>
-  <body>
-    <textarea id="editor">
-function setup() {
-  createCanvas(400, 400);
-  background(220);
-}
 
-function draw() {
-  ellipse(mouseX, mouseY, 50, 50);
-}
-    </textarea>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>0PEN:SENSE</title>
+  <link rel="icon" href="./assets/favicon.svg" type="image/x-icon" />
 
-    <iframe id="preview"></iframe>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PPFraktionMono-Regular&display=swap" />
+</head>
 
-    <script>
-      const editor = document.getElementById('editor');
-      const preview = document.getElementById('preview');
+<body>
+  <header>
+    <div class="logo">
+      <img src="assets/0PEN_SENSE.svg" alt="0PEN:SENSE Logo" class="logo-img" />
+    </div>
+    <div class="about">
+      <a href="#">ABOUT</a>
+    </div>
+  </header>
 
-      function updatePreview() {
-        const code = editor.value;
-        const html = `
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
-  </head>
-  <body>
-    <script>
-${code}
-    <\/script>
-  </body>
-</html>`;
+<hr id="header-divider" />
 
-        const blob = new Blob([html], { type: 'text/html' });
-        preview.src = URL.createObjectURL(blob);
-      }
+  <section class="thumbnails">
+    <!-- Thumbnails -->
+    <div class="thumbnail" data-sensor-name="DISTANCE SENSOR"><img src="assets/thumbnail_distance_sensor.gif" alt="DISTANCE SENSOR"></div>
+    <div class="thumbnail" data-sensor-name="PIR MOTION SENSOR"><img src="assets/thumbnail_motion_sensor.gif" alt="PIR MOTION SENSOR"></div>
+    <div class="thumbnail" data-sensor-name="ACCELEROMETER"><img src="assets/thumbnail_accelerometer.gif" alt="ACCELEROMETER"></div>
+    <div class="thumbnail" data-sensor-name="SOUND SENSOR"><img src="assets/thumbnail_sound_sensor.gif" alt="SOUND SENSOR"></div>
+    <div class="thumbnail" data-sensor-name="CLOCK SENSOR"><img src="assets/thumbnail_clock_sensor.gif" alt="CLOCK SENSOR"></div>
+    <div class="thumbnail" data-sensor-name="SENSOR 6"><img src="assets/thumbnail6.png" alt="SENSOR 6"></div>
+    <div class="thumbnail" data-sensor-name="SENSOR 7"><img src="assets/thumbnail7.png" alt="SENSOR 7"></div>
+    <div class="thumbnail" data-sensor-name="SENSOR 8"><img src="assets/thumbnail8.png" alt="SENSOR 8"></div>
+    <div class="thumbnail" data-sensor-name="SENSOR 9"><img src="assets/thumbnail9.png" alt="SENSOR 9"></div>
+    <div class="thumbnail" data-sensor-name="SENSOR 10"><img src="assets/thumbnail10.png" alt="SENSOR 10"></div>
+    <div class="thumbnail" data-sensor-name="SENSOR 11"><img src="assets/thumbnail7.png" alt="SENSOR 11"></div>
+    <div class="thumbnail" data-sensor-name="SENSOR 12"><img src="assets/thumbnail8.png" alt="SENSOR 12"></div>
+    <div class="thumbnail" data-sensor-name="SENSOR 13"><img src="assets/thumbnail9.png" alt="SENSOR 13"></div>
+    <div class="thumbnail" data-sensor-name="SENSOR 14"><img src="assets/thumbnail10.png" alt="SENSOR 14"></div>
+    <div class="thumbnail" data-sensor-name="SENSOR 15"><img src="assets/thumbnail7.png" alt="SENSOR 15"></div>
+    <div class="thumbnail" data-sensor-name="SENSOR 16"><img src="assets/thumbnail8.png" alt="SENSOR 16"></div>
+    <div class="thumbnail" data-sensor-name="SENSOR 17"><img src="assets/thumbnail9.png" alt="SENSOR 17"></div>
+    <div class="thumbnail" data-sensor-name="SENSOR 18"><img src="assets/thumbnail10.png" alt="SENSOR 18"></div>
+  </section>
 
-      editor.addEventListener('input', updatePreview);
-      updatePreview();
-    </script>
-  </body>
+<hr id="body-divider" />
+
+  <section class="main-container">
+    <section class="info">
+      <a>0PEN:SENSE is an open source archive for visual experiments using sensors, created by Hannah Park during
+        MDes thesis Project @FHNW HGK Basel</a>
+    </section>
+  </section>
+
+  <!-- EMPTY containers to be filled by JS -->
+
+  <section class="detail_title" style="display: none;"></section>
+  <section class="detail" style="opacity: 0; pointer-events: none;"></section>
+
+  <script src="script.js"></script>
+</body>
 </html>
