@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Distance Sensor</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/p5.serialserver@0.0.28/lib/p5.serialport.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@makinteract/p5.serialport@0.0.4/lib/p5.serialport.min.js"></script>
+
+   <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        width: 500px;
+        height: 500px;
+        overflow: hidden;
+      }
+      canvas {
+        display: block;
+        width: 500px !important;
+        height: 500px !important;
+      }
+    </style>
+</head>
+
+<body>
+    <script>
+let x = 0, y = 0, z = 0;
+let smoothedX = 0, smoothedY = 0, smoothedZ = 0;
+let smoothing = 0.1;
+let latestData = "simulated";
+
+function setup() {
+  createCanvas(500, 500, WEBGL);
+}
+
+function draw() {
+  background(255);
+
+  // Simulate accelerometer with mouse position
+  x = map(mouseX, 0, width, -1024, 1024);
+  y = map(mouseY, 0, height, -1024, 1024);
+  z = 0;
+
+  // Smooth the motion
+  smoothedX = lerp(smoothedX, x, smoothing);
+  smoothedY = lerp(smoothedY, y, smoothing);
+  smoothedZ = lerp(smoothedZ, z, smoothing);
+
+  // 3D cube centered in space with rotation
+  ambientLight(100);
+  rotateX(radians(map(smoothedY, -1024, 1024, -180, 180)));
+  rotateY(radians(map(smoothedX, -1024, 1024, -180, 180)));
+  rotateZ(radians(map(smoothedZ, -1024, 1024, -180, 180)));
+  ambientMaterial(0);
+  stroke(0);
+  box(150);  // Automatically centered at (0, 0, 0) in WEBGL mode
+
+  // Overlay 2D text
+  resetMatrix();  // Reset transformations for flat overlay
+  camera();       // Reset camera to default for 2D
+  noLights();
+  fill(0);
+  textSize(16);
+  textAlign(LEFT, BOTTOM);
+  text("Simulated Accel (x,y,z): " + int(x) + ", " + int(y) + ", " + int(z), -width / 2 + 20, height / 2 - 20);
+}
+
+  </script>
+</body>
+
+</html>

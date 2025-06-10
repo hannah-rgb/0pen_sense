@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Distance Sensor</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/p5.serialserver@0.0.28/lib/p5.serialport.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@makinteract/p5.serialport@0.0.4/lib/p5.serialport.min.js"></script>
+
+   <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        width: 500px;
+        height: 500px;
+        overflow: hidden;
+      }
+      canvas {
+        display: block;
+        width: 500px !important;
+        height: 500px !important;
+      }
+    </style>
+</head>
+
+<body>
+    <script>
+let circles = [];
+
+function setup() {
+  createCanvas(500, 500);
+  ellipseMode(RADIUS);
+
+  // Start with 1 big circle
+  circles.push({ x: width / 2, y: height / 2, r: 100 });
+}
+
+function draw() {
+  background(255);
+  fill(0);
+  noStroke();
+
+  for (let c of circles) {
+    ellipse(c.x, c.y, c.r, c.r);
+  }
+}
+
+// Simulate clap by mouse click
+function mousePressed() {
+  splitCircles();
+}
+
+function splitCircles() {
+  let newCircles = [];
+
+  for (let c of circles) {
+    let r = c.r / 2;
+    if (r > 2) {
+      newCircles.push({ x: c.x - r, y: c.y, r: r });
+      newCircles.push({ x: c.x + r, y: c.y, r: r });
+    }
+  }
+
+  if (newCircles.length === 0) {
+    // All too small — reset
+    circles = [{ x: width / 2, y: height / 2, r: 50 }];
+  } else {
+    circles = newCircles;
+  }
+}
+
+  </script>
+</body>
+
+</html>

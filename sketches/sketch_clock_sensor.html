@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Distance Sensor</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/p5.serialserver@0.0.28/lib/p5.serialport.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@makinteract/p5.serialport@0.0.4/lib/p5.serialport.min.js"></script>
+
+   <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        width: 500px;
+        height: 500px;
+        overflow: hidden;
+      }
+      canvas {
+        display: block;
+        width: 500px !important;
+        height: 500px !important;
+      }
+    </style>
+</head>
+
+<body>
+    <script>
+let hours = 0, minutes = 0, seconds = 0;
+let lastSecond = -1;
+let circleSize = 10;
+let baseSize = 10;
+let maxSize = 250;
+
+function setup() {
+  createCanvas(500, 500);
+  textFont('monospace');
+  textAlign(CENTER, CENTER);
+  angleMode(DEGREES);
+}
+
+function draw() {
+  background(255);
+
+  // Get system time
+  let now = new Date();
+  hours = now.getHours();
+  minutes = now.getMinutes();
+  seconds = now.getSeconds();
+
+  // Color mapped to 10-second cycle
+  let grayscale = map(seconds % 10, 0, 9, 255, 0);
+
+  fill(grayscale);
+  noStroke();
+
+  // Reset circle size at the start of each new second
+  if (seconds !== lastSecond) {
+    lastSecond = seconds;
+    circleSize = baseSize;
+  }
+
+  // Grow size from 10 to 250 within the current second
+  let t = (millis() % 1000) / 1000;
+  circleSize = lerp(baseSize, maxSize, t);
+
+  // Draw circle
+  ellipse(width / 2, height / 2, circleSize);
+
+  // Draw current time
+  fill(0);
+  textSize(20);
+  text(nf(hours, 2) + ":" + nf(minutes, 2) + ":" + nf(seconds, 2), width / 2, height - 40);
+}
+
+  </script>
+</body>
+
+</html>
