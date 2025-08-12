@@ -174,7 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const name = thumbnail.dataset.sensorName;
       const data = sensorData[name];
       const sanitizedName = name.toLowerCase().replace(/\s+/g, '_');
-      const imageSrc = `assets/si_${sanitizedName}.gif`;
+      const imageSrc = `assets/si_${sanitizedName}.png`;
 
       infoSection.style.display = 'none';
       thumbnailsContainer.style.display = 'grid';
