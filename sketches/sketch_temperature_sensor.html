@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Temperature (Mouse)</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <style>
+    html,body{margin:0;width:500px;height:500px;overflow:hidden}
+    canvas{display:block;width:500px!important;height:500px!important}
+  </style>
+</head>
+<body>
+<script>
+const TEMP_MIN = 15, TEMP_MAX = 35;
+
+let t = 0;          // current temp (simulated via mouseY)
+let s = (TEMP_MIN + TEMP_MAX) / 2;  // smoothed temp (start mid so it's visible)
+let base = (TEMP_MIN + TEMP_MAX) / 2; // baseline starts mid
+
+function setup(){
+  createCanvas(500,500);
+  textFont('monospace');
+  textAlign(CENTER);
+}
+
+function draw(){
+  background(255); // not pure white so the circle shows up even if light
+
+  // Mouse → simulated °C (top=cool, bottom=warm)
+  t = map(mouseY, 0, height, TEMP_MIN, TEMP_MAX);
+  s = lerp(s, t, 0.1);
+
+  // delta from baseline (negative = warmer than baseline, positive = cooler)
+  const d = base - s;
+
+  // Map around baseline so both directions change brightness
+  // -10..+10 °C → dark..light; clamp to a visible range
+  let g = map(d, -10, 10, 40, 220);
+  g = constrain(g, 40, 220);
+
+  // Circle
+noStroke(); strokeWeight(1); // subtle outline so it never disappears
+  fill(g);
+  circle(width/2, height/2, 200);
+
+  // HUD
+  noStroke(); fill(0); textSize(12);
+  text(`~${nf(t,1,1)}°C   Δ:${nf(d,1,1)}   (R to set baseline)`, width/2, height-20);
+}
+
+function keyPressed(){
+  if (key === 'r' || key === 'R') base = s;
+}
+</script>
+</body>
+</html>

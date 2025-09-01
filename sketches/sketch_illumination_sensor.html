@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Illumination Sensor</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/p5.serialserver@0.0.28/lib/p5.serialport.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@makinteract/p5.serialport@0.0.4/lib/p5.serialport.min.js"></script>
+
+   <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        width: 500px;
+        height: 500px;
+        overflow: hidden;
+      }
+      canvas {
+        display: block;
+        width: 500px !important;
+        height: 500px !important;
+      }
+    </style>
+</head>
+
+<body>
+    <script>
+const N = 16;          // number of wedges (blades)
+const PAD = 80;        // keep inside the square
+function setup(){ createCanvas(500,500); noStroke(); }
+function draw(){
+  background(255);
+  const cx=width/2, cy=height/2, outerR=min(width,height)/2 - PAD;
+
+  // Simulated lux (mouse): 0..1 darkness→brightness
+  const n = constrain(map(mouseY, 0, height, 0, 1), 0, 1);
+
+  // Aperture radius grows with brightness
+  const r = lerp(outerR*0.08, outerR*0.78, n);
+  const halfW = 0.12; // angular half-width of each wedge
+
+  fill(0);
+  for (let i=0;i<N;i++){
+    const a = i * TWO_PI / N;
+    const b1 = a - halfW, b2 = a + halfW;
+    // base on outer circle
+    const bx1 = cx + cos(b1)*outerR, by1 = cy + sin(b1)*outerR;
+    const bx2 = cx + cos(b2)*outerR, by2 = cy + sin(b2)*outerR;
+    // apex on inner (aperture) circle
+    const ax  = cx + cos(a)*r,       ay  = cy + sin(a)*r;
+    triangle(bx1,by1, bx2,by2, ax,ay);
+  }
+
+  // optional: show current "aperture" as a tiny dot at center
+  // fill(255); circle(cx,cy, max(0, r*0.06));
+}
+  </script>
+</body>
+
+</html>

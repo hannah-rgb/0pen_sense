@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Air Quality Sensor</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/p5.serialserver@0.0.28/lib/p5.serialport.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@makinteract/p5.serialport@0.0.4/lib/p5.serialport.min.js"></script>
+
+   <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        width: 500px;
+        height: 500px;
+        overflow: hidden;
+      }
+      canvas {
+        display: block;
+        width: 500px !important;
+        height: 500px !important;
+      }
+    </style>
+</head>
+
+<body>
+    <script>
+ const AQ_MIN = 0, AQ_MAX = 150;  // adjust to your sensor
+  function setup() { createCanvas(500, 500); noStroke(); rectMode(CENTER); }
+  function draw() {
+    background(255);
+    const aq = map(mouseY, 0, height, AQ_MIN, AQ_MAX);  // ← replace with your sensor value
+    const n = constrain((aq - AQ_MIN) / (AQ_MAX - AQ_MIN), 0, 1);
+    const cell = lerp(4, 40, n);                        // clean → small cells, dirty → big
+    const R = 160;
+    fill(0);
+    for (let y = cell/2; y < height; y += cell) {
+      for (let x = cell/2; x < width; x += cell) {
+        const dx = x - width/2, dy = y - height/2;
+        if (dx*dx + dy*dy < R*R) rect(x, y, cell*0.9, cell*0.9, 2);
+      }
+    }
+  }
+  </script>
+</body>
+
+</html>

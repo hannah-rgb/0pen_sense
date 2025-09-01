@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>LDR Quad — Center Square (Mouse)</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/p5.serialserver@0.0.28/lib/p5.serialport.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@makinteract/p5.serialport@0.0.4/lib/p5.serialport.min.js"></script>
+
+   <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        width: 500px;
+        height: 500px;
+        overflow: hidden;
+      }
+      canvas {
+        display: block;
+        width: 500px !important;
+        height: 500px !important;
+      }
+    </style>
+</head>
+
+<body>
+    <script>
+const SIZE = 100;     // square side
+const FALLOFF = 220;  // bigger = broader brightness spread
+
+function setup(){
+  createCanvas(500,500);
+  pixelDensity(1);    // exact pixel indexing
+  noStroke();
+}
+
+function draw(){
+  background(255);
+
+  // centered square
+  const x0 = (width - SIZE) >> 1;
+  const y0 = (height - SIZE) >> 1;
+
+  // corner coords
+  const tl = {x:x0,         y:y0};
+  const tr = {x:x0+SIZE,    y:y0};
+  const bl = {x:x0,         y:y0+SIZE};
+  const br = {x:x0+SIZE,    y:y0+SIZE};
+
+  // brightness per corner (0..1), stronger when mouse is closer
+  const bTL = cornerBright(tl.x, tl.y);
+  const bTR = cornerBright(tr.x, tr.y);
+  const bBL = cornerBright(bl.x, bl.y);
+  const bBR = cornerBright(br.x, br.y);
+
+  drawGradientSquare(x0, y0, SIZE, SIZE, bTL, bTR, bBL, bBR);
+
+  // thin frame
+  noFill(); noStroke(); rect(x0, y0, SIZE, SIZE);
+}
+
+function cornerBright(cx, cy){
+  const d = dist(mouseX, mouseY, cx, cy);
+  return constrain(1 - d / FALLOFF, 0, 0.5); // 0..1
+}
+
+// fast grayscale bilinear gradient into the square
+function drawGradientSquare(x,y,w,h,tl,tr,bl,br){
+  loadPixels();
+  for (let j=0; j<h; j++){
+    const v = j/(h-1);
+    const L = tl*(1-v) + bl*v;  // left edge blend
+    const R = tr*(1-v) + br*v;  // right edge blend
+    for (let i=0; i<w; i++){
+      const u = i/(w-1);
+      const g = L*(1-u) + R*u;  // interior bilinear blend
+      const c = (g*255) | 0;
+      const idx = ((y+j)*width + (x+i)) * 4;
+      pixels[idx] = pixels[idx+1] = pixels[idx+2] = c;
+      pixels[idx+3] = 255;
+    }
+  }
+  updatePixels();
+}
+  </script>
+</body>
+
+</html>

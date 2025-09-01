@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Distance Sensor 2</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/p5.serialserver@0.0.28/lib/p5.serialport.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@makinteract/p5.serialport@0.0.4/lib/p5.serialport.min.js"></script>
+
+   <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        width: 500px;
+        height: 500px;
+        overflow: hidden;
+      }
+      canvas {
+        display: block;
+        width: 500px !important;
+        height: 500px !important;
+      }
+    </style>
+</head>
+
+<body>
+    <script>
+const MIN_MM = 50, MAX_MM = 500;  // simulate VL53L0X range
+  const BEADS = 12;                 // number of circles around the ring
+
+  function setup(){
+    createCanvas(500, 500);
+    noStroke();
+    textFont('monospace'); textSize(14);
+  }
+
+  function draw(){
+    background(255);
+
+    // Simulated distance from mouseY (top = near, bottom = far)
+    let d = int(map(mouseY, 0, height, MIN_MM, MAX_MM));
+    d = constrain(d, MIN_MM, MAX_MM);
+
+    const n = (d - MIN_MM) / (MAX_MM - MIN_MM);
+
+    // Map distance → visuals
+    const ringR    = lerp(20, 100, n);      // ring radius grows with distance
+    const baseSize = lerp(2, 60, n);        // bead base size grows with distance
+    const amp      = lerp(2, 20, n);        // pulsing amplitude grows with distance
+    const speed    = lerp(0.03, 0.12, n);   // loop speed grows with distance
+
+    const cx = width/2, cy = height/2;
+    const t = frameCount * speed;
+
+    // Compute step locally to avoid init-order issues
+    const step = TWO_PI / BEADS;
+
+    fill(0);
+    for (let i = 0; i < BEADS; i++){
+      const a = i * step;
+      const x = cx + cos(a) * ringR;
+      const y = cy + sin(a) * ringR;
+
+      // Size wave looping around the ring
+      const s = Math.max(0, baseSize + Math.sin(t + i * step) * amp);
+      circle(x, y, s);
+    }
+
+    fill(0);
+  }
+  </script>
+</body>
+
+</html>

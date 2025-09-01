@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>GPS Sensor</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/p5.serialserver@0.0.28/lib/p5.serialport.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@makinteract/p5.serialport@0.0.4/lib/p5.serialport.min.js"></script>
+
+   <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        width: 500px;
+        height: 500px;
+        overflow: hidden;
+      }
+      canvas {
+        display: block;
+        width: 500px !important;
+        height: 500px !important;
+      }
+    </style>
+</head>
+
+<body>
+    <script>
+let rot = 0;
+
+// --- controls ---
+const N = 32;        // number of lines (spokes)
+const STROKE_W = 2;  // line thickness
+const LEN = 140;      // spoke length (shorter = smaller lines)
+
+function setup(){
+  createCanvas(500, 500);
+  textFont('monospace'); textSize(12);
+}
+
+function draw(){
+  background(255);
+
+  // MouseX = heading (0..359°), MouseY = focus (beam width)
+  const headingDeg = map(mouseX, 0, width, 0, 359);
+  const headingRad = radians(headingDeg) - HALF_PI;  // 0° points up
+  const focus = map(mouseY, 0, height, 0.6, 2.0);    // bigger → tighter beam
+
+  const cx = width/2, cy = height/2;
+  const pad = 1;
+  const Rmax = min(width, height)/2 - pad;          // keep inside the square
+  const r1 = Rmax * 0.65;                            // end radius
+  const r0 = r1 - LEN;                               // start radius
+
+  const step = TWO_PI / N;
+  rot += 0.01;
+
+  strokeWeight(STROKE_W);
+  for (let i = 0; i < N; i++){
+    const a = i * step + rot;                        // spoke angle
+    const d = angleDiff(a, headingRad);              // closeness to heading [-PI..PI]
+    const w = pow((cos(d) + 1) * 0.5, focus);        // 0..1
+    const alpha = 12 + 243 * w;
+
+    stroke(0, alpha);
+    line(
+      cx + cos(a) * r0, cy + sin(a) * r0,
+      cx + cos(a) * r1, cy + sin(a) * r1
+    );
+  }
+}
+
+// shortest signed angle difference in radians [-PI, PI]
+function angleDiff(a, b){
+  let d = (a - b) % (TWO_PI);
+  if (d >  PI) d -= TWO_PI;
+  if (d < -PI) d += TWO_PI;
+  return d;
+}
+  </script>
+</body>
+
+</html>

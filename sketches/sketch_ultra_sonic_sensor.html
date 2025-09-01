@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Ultra Sonic Sensor</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/p5.serialserver@0.0.28/lib/p5.serialport.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@makinteract/p5.serialport@0.0.4/lib/p5.serialport.min.js"></script>
+
+   <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        width: 500px;
+        height: 500px;
+        overflow: hidden;
+      }
+      canvas {
+        display: block;
+        width: 500px !important;
+        height: 500px !important;
+      }
+    </style>
+</head>
+
+<body>
+    <script>
+const PAD = 100;            // keep everything inside the canvas
+const PING_EVERY = 900;    // ms between pings
+const TRAVEL_MS = 900;     // ms for ping to reach outer radius
+const HIT_THICK = 7;       // visual thickness for hit detection
+
+let pings = [];
+let lastPing = 0;
+
+function setup(){
+  createCanvas(500,500);
+  noFill();
+}
+
+function draw(){
+  background(255);
+
+  // Corner center (bottom-left), quarter circle opens up-right
+  const ox = PAD, oy = height - PAD;
+
+  // Max radius that stays inside the canvas from this corner
+  const outerR = min(width - PAD - ox, oy - PAD);
+
+  // Map mouse to a target radius by projecting onto the 45° ray
+  const dir = createVector(1, -1).normalize();     // up-right diagonal
+  const v   = createVector(mouseX - ox, mouseY - oy).mult(1); // from corner to mouse
+  const rProj = constrain(v.x*dir.x + v.y*dir.y, 0, outerR);
+  const hitR  = rProj; // target distance as radius
+
+  // Launch pings at intervals
+  const now = millis();
+  if (now - lastPing > PING_EVERY){
+    pings.push({ t0: now });
+    lastPing = now;
+  }
+
+  // Draw the target “wall” as a thin quarter-arc at radius = hitR
+  stroke(0); strokeWeight(2);
+  arc(ox, oy, hitR*2, hitR*2, -HALF_PI, 0);
+
+  // Draw each ping: expanding radius from 0 → outerR along the 45° ray
+  for (let i = pings.length - 1; i >= 0; i--){
+    const t = now - pings[i].t0;
+    const u = t / TRAVEL_MS;
+    if (u >= 1){ pings.splice(i,1); continue; }
+
+    const r = u * outerR;
+
+    // ping dot along the diagonal
+    const px = ox + dir.x * r;
+    const py = oy + dir.y * r;
+
+    const near = abs(r - hitR) < HIT_THICK;
+    noStroke();
+    fill(0);
+    circle(px, py, near ? 14 : 8);
+
+    // flash a thicker arc exactly at the hit radius
+    if (near){
+      noFill();
+      stroke(0); strokeWeight(6);
+      arc(ox, oy, r*2, r*2, -HALF_PI, 0);
+    }
+  }}
+  </script>
+</body>
+
+</html>

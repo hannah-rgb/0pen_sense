@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>CO2 Sensor</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/p5.serialserver@0.0.28/lib/p5.serialport.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@makinteract/p5.serialport@0.0.4/lib/p5.serialport.min.js"></script>
+
+   <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        width: 500px;
+        height: 500px;
+        overflow: hidden;
+      }
+      canvas {
+        display: block;
+        width: 500px !important;
+        height: 500px !important;
+      }
+    </style>
+</head>
+
+<body>
+    <script>
+const CO2_MIN=400, CO2_MAX=2000;
+  function setup(){ createCanvas(500,500); noStroke(); }
+  function draw(){
+    background(255);
+    const co2 = map(mouseY,0,height,CO2_MIN,CO2_MAX); // ← replace with sensor ppm
+    const n = constrain((co2-CO2_MIN)/(CO2_MAX-CO2_MIN),0,1);
+
+    const points = floor(lerp(5,16,n));               // more points = more “spikes”
+    const outerR = 160;
+    const innerR = outerR * lerp(0.85,0.30,n);        // higher CO₂ → sharper spikes
+    const rot    = frameCount * lerp(0.02,0.005,n);   // higher CO₂ → slower rotation
+
+    translate(width/2, height/2);
+    rotate(rot);
+    fill(0);
+    beginShape();
+    const steps = points*2;
+    for (let i=0; i<steps; i++){
+      const a = TWO_PI * i/steps;
+      const r = (i%2===0)? outerR : innerR;
+      vertex(cos(a)*r, sin(a)*r);
+    }
+    endShape(CLOSE);
+  }
+  </script>
+</body>
+
+</html>

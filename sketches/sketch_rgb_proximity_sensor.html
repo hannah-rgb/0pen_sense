@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8" />
-  <title>Distance Sensor</title>
+  <title>Ultra Sonic Sensor</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/p5.serialserver@0.0.28/lib/p5.serialport.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@makinteract/p5.serialport@0.0.4/lib/p5.serialport.min.js"></script>
@@ -26,32 +26,19 @@
 
 <body>
     <script>
-function setup() {
-  let canvas = createCanvas(500, 500);
-  canvas.parent(document.body);
+const RADIUS=170, ALPHA=150;
+function setup(){ createCanvas(500,500); noStroke(); }
+function draw(){
+  background(255);
+  // MouseY simulates proximity: top=near (tight), bottom=far (spread)
+  const spread = map(mouseY, 0, height, 70, 180);
+  const cx=width/2, cy=height/2;
 
-  // This makes the canvas responsive to its container (the iframe)
-  // canvas.style('width', '200%');
-  // canvas.style('height', '200%');
-
-}
-
-
-    function draw() {
-      background(255);
-
-      // Use mouseY instead of serial data
-      let d = constrain(mouseY, 50, 500);
-      let size = map(d, 50, 500, 400, 50); // invert size
-
-      fill(0, 0, 0);
-      ellipse(width / 2-50, height / 2-50, size, size);
-
-      fill(0);
-      // textSize(16);
-      // text("Distance (simulated): " + d + " mm", 20, height - 20);
-    }
-
+  blendMode(SCREEN);
+  fill(255,0,0,ALPHA);   circle(cx,           cy-spread, RADIUS);
+  fill(0,255,0,ALPHA);   circle(cx-spread*0.87, cy+spread*0.5, RADIUS);
+  fill(0,0,255,ALPHA);   circle(cx+spread*0.87, cy+spread*0.5, RADIUS);
+  blendMode(BLEND);}
   </script>
 </body>
 

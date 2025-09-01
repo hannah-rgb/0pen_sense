@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Gas Sensor</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/p5.serialserver@0.0.28/lib/p5.serialport.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@makinteract/p5.serialport@0.0.4/lib/p5.serialport.min.js"></script>
+
+   <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        width: 500px;
+        height: 500px;
+        overflow: hidden;
+      }
+      canvas {
+        display: block;
+        width: 500px !important;
+        height: 500px !important;
+      }
+    </style>
+</head>
+
+<body>
+    <script>
+const TRI_W = 260; // triangle side (px)
+let pg;            // offscreen buffer so only the triangle gets blurred
+
+function setup(){
+  createCanvas(500,500);
+  pg = createGraphics(TRI_W, TRI_W);
+  pg.pixelDensity(1);
+  noStroke();
+}
+
+function draw(){
+  background(255);
+
+  // MouseY → blur amount (0..24)
+  const blurAmt = map(mouseY, 0, height, 0, 24);
+
+  // Draw a crisp triangle, then blur the buffer (no accumulation)
+  pg.clear();
+  drawTriangle(pg);
+  if (blurAmt > 0) pg.filter(BLUR, blurAmt);
+
+  // Center it
+  image(pg, (width-pg.width)/2, (height-pg.height)/2);
+}
+
+function drawTriangle(g){
+  g.noStroke(); g.fill(0);
+  const cx = g.width/2, cy = g.height/2;
+  const side = TRI_W*0.86;                     // margin inside the buffer
+  const h = side*Math.sqrt(3)/2;               // triangle height
+  const v1 = [cx,            cy - (2/3)*h];    // top
+  const v2 = [cx - side/2,   cy + (1/3)*h];    // bottom-left
+  const v3 = [cx + side/2,   cy + (1/3)*h];    // bottom-right
+  g.triangle(v1[0],v1[1], v2[0],v2[1], v3[0],v3[1]);
+}
+  </script>
+</body>
+
+</html>

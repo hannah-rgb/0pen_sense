@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Humidity Sensor</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/p5.serialserver@0.0.28/lib/p5.serialport.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@makinteract/p5.serialport@0.0.4/lib/p5.serialport.min.js"></script>
+
+   <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        width: 500px;
+        height: 500px;
+        overflow: hidden;
+      }
+      canvas {
+        display: block;
+        width: 500px !important;
+        height: 500px !important;
+      }
+    </style>
+</head>
+
+<body>
+    <script>
+let bubbles = [];
+let lastHum = 0;
+
+// --- Tank geometry (inside the square) ---
+const cx = 250, cy = 250; // center
+const R  = 150;           // tank radius
+const margin = 50;        // inner padding from the circle boundary
+
+// --- Bubble + physics params ---
+const BUB_R = 20;         // ONE size for all bubbles
+const GRAV  = 0.12;       // gravity
+const AIR   = 0.995;      // air drag
+const COLLISION_DAMP = 0.4; // how much velocity is lost on collision
+const MAX_BUBBLES = 220;
+
+function setup(){
+  createCanvas(500, 500);
+  noStroke();
+}
+
+function draw(){
+  background(255);
+
+  // Humidity from mouse: top = dry(0), bottom = humid(1)
+  const hum = constrain(map(mouseY, 0, height, 0, 1), 0, 1);
+  const dry = 1 - hum;
+
+  // Optional faint tank outline (invisible fill)
+  noFill(); noStroke(); strokeWeight(1);
+  circle(cx, cy, R*2 - margin*0.2); noStroke();
+
+  // Spawn rate and fall speed scale with humidity
+  const spawnProb = lerp(0.01, 0.10, hum);      // chance per frame
+  const fallBoost = lerp(0.1, 0.5, hum);        // slightly faster when humid
+
+  // Spawn near inside-top boundary of the circle
+  if (random() < spawnProb && countAlive() < MAX_BUBBLES) {
+    const x = random(cx - (R - margin), cx + (R - margin));
+    const dx = x - cx;
+    const yTop = cy - sqrt(max(0, R*R - dx*dx)) + margin + random(0, 6);
+    const b = new Bubble(x, yTop);
+    b.vy = random(0.2, 0.6) * fallBoost;
+    bubbles.push(b);
+  }
+
+  // Physics update
+  // 1) integrate
+  for (const b of bubbles) b.integrate(hum, fallBoost);
+
+  // 2) boundary clamp (stay inside circle)
+  for (const b of bubbles) clampInsideCircle(b);
+
+  // 3) resolve collisions (disc-disc)
+  resolveCollisions();
+
+  // 4) settle test & dry popping
+  for (const b of bubbles) {
+    b.considerSettled();
+    if (random() < dry * 0.02) b.popNow(); // pop more as it gets dry
+  }
+
+  // Quick “dry snap” when humidity drops sharply
+  if (hum < lastHum - 0.05) {
+    for (let k = 0; k < 10; k++) {
+      const i = floor(random(bubbles.length));
+      bubbles[i]?.popNow();
+    }
+  }
+  lastHum = hum;
+
+  // Draw & prune
+  for (let i = bubbles.length-1; i >= 0; i--){
+    bubbles[i].draw();
+    if (bubbles[i].done) bubbles.splice(i, 1);
+  }
+}
+
+function countAlive(){
+  let n = 0;
+  for (const b of bubbles) if (b.state !== 'pop') n++;
+  return n;
+}
+
+class Bubble {
+  constructor(x, y){
+    this.x = x; this.y = y;
+    this.vx = random(-0.15, 0.15);
+    this.vy = 0.3;
+    this.state = 'fall';     // 'fall', 'settled', 'pop'
+    this.popT = 0;
+    this.done = false;
+  }
+  integrate(hum, fallBoost){
+    if (this.state === 'fall'){
+      // gravity + tiny drift
+      this.vy += GRAV * fallBoost;
+      this.vx += sin(frameCount*0.02 + this.y*0.01) * 0.0015;
+
+      // air drag
+      this.vx *= AIR;
+      this.vy *= AIR;
+
+      // move
+      this.x += this.vx;
+      this.y += this.vy;
+    } else if (this.state === 'pop'){
+      this.popT++;
+      if (this.popT > 14) this.done = true;
+    }
+  }
+  considerSettled(){
+    if (this.state !== 'fall') return;
+
+    // If very slow and there is support below (near boundary or touching others), settle.
+    const slow = (abs(this.vx) + abs(this.vy)) < 0.15;
+
+    // boundary support? (touching the inner bottom arc)
+    const yBottom = bottomYAtX(this.x) - BUB_R - 0.5;
+    const onFloor = this.y >= yBottom - 0.5;
+
+    // neighbor support? (any touching bubble slightly below)
+    let supported = false;
+    for (const other of bubbles){
+      if (other === this) continue;
+      if (other.state === 'pop') continue;
+      const dx = other.x - this.x;
+      const dy = other.y - this.y;
+      const d2 = dx*dx + dy*dy;
+      const minD = (BUB_R*2) - 0.5;
+      if (d2 > 0 && d2 < minD*minD && other.y > this.y - 0.1) {
+        supported = true; break;
+      }
+    }
+
+    if (slow && (onFloor || supported)) {
+      this.state = 'settled';
+      this.vx = 0; this.vy = 0;
+    }
+  }
+  popNow(){
+    if (this.state !== 'pop') {
+      this.state = 'pop';
+      this.vx = 0; this.vy = 0;
+      this.popT = 0;
+    }
+  }
+  draw(){
+    if (this.state !== 'pop'){
+      fill(0, 220);
+      circle(this.x, this.y, BUB_R*2);
+    } else {
+      noFill();
+      stroke(0);
+      strokeWeight(2);
+      circle(this.x, this.y, BUB_R*2 + this.popT * 2);
+      noStroke();
+    }
+  }
+}
+
+// --- Geometry helpers ---
+function bottomYAtX(x){
+  // y of the inner bottom boundary at x, inside the circle with margin
+  const dx = x - cx;
+  const innerR = R - margin;
+  return cy + sqrt(max(0, innerR*innerR - dx*dx));
+}
+
+function clampInsideCircle(b){
+  // Keep bubble fully inside the inner circle (radius R - margin)
+  const innerR = R - margin - BUB_R;
+  const dx = b.x - cx;
+  const dy = b.y - cy;
+  const d = sqrt(dx*dx + dy*dy);
+  if (d > innerR){
+    const a = atan2(dy, dx);
+    b.x = cx + cos(a) * innerR;
+    b.y = cy + sin(a) * innerR;
+    // dampen velocity on wall contact
+    b.vx *= 0.5;
+    b.vy *= 0.5;
+  }
+}
+
+function resolveCollisions(){
+  // Simple O(n^2) disc collision/response
+  for (let i = 0; i < bubbles.length; i++){
+    const a = bubbles[i];
+    if (a.state === 'pop') continue;
+    for (let j = i+1; j < bubbles.length; j++){
+      const b = bubbles[j];
+      if (b.state === 'pop') continue;
+
+      let dx = b.x - a.x;
+      let dy = b.y - a.y;
+      let dist2 = dx*dx + dy*dy;
+      const minD = BUB_R*2;
+
+      if (dist2 > 0 && dist2 < minD*minD){
+        const d = sqrt(dist2);
+        const overlap = (minD - d) + 0.01;
+        const nx = dx / d, ny = dy / d;
+
+        // separate equally
+        a.x -= nx * overlap * 0.5; a.y -= ny * overlap * 0.5;
+        b.x += nx * overlap * 0.5; b.y += ny * overlap * 0.5;
+
+        // damp velocities along the collision normal (to encourage settling)
+        const avn = a.vx*nx + a.vy*ny;
+        const bvn = b.vx*nx + b.vy*ny;
+        a.vx -= nx * avn * COLLISION_DAMP;
+        a.vy -= ny * avn * COLLISION_DAMP;
+        b.vx -= nx * bvn * COLLISION_DAMP;
+        b.vy -= ny * bvn * COLLISION_DAMP;
+      }
+    }
+  }
+}
+  </script>
+</body>
+
+</html>

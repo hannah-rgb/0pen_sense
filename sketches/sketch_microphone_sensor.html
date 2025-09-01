@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Microphone Sensor</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/addons/p5.sound.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/p5.serialserver@0.0.28/lib/p5.serialport.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@makinteract/p5.serialport@0.0.4/lib/p5.serialport.min.js"></script>
+   <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        width: 500px;
+        height: 500px;
+        overflow: hidden;
+      }
+      canvas {
+        display: block;
+        width: 500px !important;
+        height: 500px !important;
+      }
+    </style>
+</head>
+
+<body>
+    <script>
+let mic, fft;
+let rects = [];
+let currentRect = null;
+let pitchTolerance = 50;
+let scrollSpeed = 2;
+
+let recognition;
+let currentTranscript = "";
+let customFont;
+
+// 1) Disable blocking preload while testing the path
+function preload() {
+  // TEMP: comment this out until the font path works
+  // customFont = loadFont("./fonts/ABCPelikanCondensedVariableVF-Trial.ttf");
+}
+
+function setup() {
+  createCanvas(500, 500);
+
+  // 2) Load font non-blocking (won’t freeze if it fails)
+  loadFont("./fonts/ABCPelikanCondensedVariableVF-Trial.ttf",
+    f => { customFont = f; textFont(customFont); },
+    () => { textFont('monospace'); } // fallback
+  );
+
+  // 3) Start audio & mic with a user gesture (safer across browsers)
+  //    Click once anywhere to start; remove this block if your current flow works.
+  userStartAudio();
+
+  mic = new p5.AudioIn();
+  mic.start();
+  fft = new p5.FFT();
+  fft.setInput(mic);
+
+  startSpeechRecognition();
+}
+
+function draw() {
+  background(255);
+
+  let spectrum = fft.analyze();
+  let pitch = fft.getCentroid();
+
+  if (pitch > 80 && pitch < 2000) {
+    let y = map(pitch, 100, 1000, height - 50, 50);
+
+    if (currentRect === null) {
+      currentRect = { x: width, y, w: 40, h: 40, pitch, word: currentTranscript };
+    } else {
+      if (abs(pitch - currentRect.pitch) > pitchTolerance) {
+        rects.push(currentRect);
+        currentRect = { x: width, y, w: 40, h: 40, pitch, word: currentTranscript };
+      } else {
+        currentRect.w += scrollSpeed;
+      }
+    }
+  }
+
+  for (let i = rects.length - 1; i >= 0; i--) {
+    rects[i].x -= scrollSpeed;
+    fill(0);
+    rect(rects[i].x, rects[i].y, rects[i].w, rects[i].h);
+    fill(255);
+    textAlign(CENTER, CENTER);
+    textSize(20);
+    text(rects[i].word, rects[i].x + rects[i].w / 2, rects[i].y + rects[i].h / 2);
+    if (rects[i].x + rects[i].w < 0) rects.splice(i, 1);
+  }
+
+  if (currentRect) {
+    currentRect.x -= scrollSpeed;
+    fill(0);
+    rect(currentRect.x, currentRect.y, currentRect.w, currentRect.h);
+    fill(255);
+    textAlign(CENTER, CENTER);
+    textSize(20);
+    text(currentRect.word, currentRect.x + currentRect.w / 2, currentRect.y + currentRect.h / 2);
+  }
+
+  fill(0);
+  textSize(14);
+  textAlign(CENTER);
+  text("Pitch: " + int(pitch) + " Hz", width / 2, height - 20);
+}
+
+function startSpeechRecognition() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SpeechRecognition();
+  recognition.lang = "en-US";
+  recognition.continuous = true;
+  recognition.interimResults = false;
+  recognition.onresult = (e) => {
+    const r = e.results[e.results.length - 1];
+    currentTranscript = r[0].transcript.trim().toUpperCase();
+  };
+  recognition.onerror = (e) => console.error("Speech error:", e.error);
+  recognition.start();
+}
+
+  </script>
+</body>
+
+</html>

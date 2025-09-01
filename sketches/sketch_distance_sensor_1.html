@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8" />
-  <title>PIR Motion Sensor</title>
+  <title>Distance Sensor 1</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/p5.serialserver@0.0.28/lib/p5.serialport.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@makinteract/p5.serialport@0.0.4/lib/p5.serialport.min.js"></script>
@@ -26,35 +26,31 @@
 
 <body>
     <script>
-let latestData = "waiting for data";
-
 function setup() {
-  createCanvas(500, 500);
+  let canvas = createCanvas(500, 500);
+  canvas.parent(document.body);
+
+  // This makes the canvas responsive to its container (the iframe)
+  // canvas.style('width', '200%');
+  // canvas.style('height', '200%');
+
 }
 
-function draw() {
-  background(255);
 
-  // Simulate sensor input using mouse press
-  if (mouseIsPressed) {
-    latestData = "1";
-  } else {
-    latestData = "0";
-  }
+    function draw() {
+      background(255);
 
-  // Conditional fill color based on simulated input
-  if (latestData === "1") {
-    fill(0);
-  } else {
-    fill(255);
-  }
+      // Use mouseY instead of serial data
+      let d = constrain(mouseY, 50, 500);
+      let size = map(d, 50, 500, 400, 50); // invert size
 
-  rect(150, 150, 125, 125);
+      fill(0, 0, 0);
+      ellipse(width / 2-50, height / 2-50, size, size);
 
-  fill(0);
-  textSize(20);
-  text("Motion: " + latestData, 20, height - 20);
-}
+      fill(0);
+      // textSize(16);
+      // text("Distance (simulated): " + d + " mm", 20, height - 20);
+    }
 
   </script>
 </body>
